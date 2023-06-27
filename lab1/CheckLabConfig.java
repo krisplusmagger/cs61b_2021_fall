@@ -77,20 +77,20 @@ public class CheckLabConfig {
 		String yourOS = System.getProperty("os.name").toLowerCase();
 		String yourOSVersion = System.getProperty("os.version");
 
-		if (yourOS.contains("windows")) {
-			checkConfig(true);
-		} else {
-			checkConfig(false);
-		}
+//		if (yourOS.contains("windows")) {
+//			checkConfig(true);
+//		} else {
+//			checkConfig(false);
+//		}
 
-		/*if (yourOS.contains("mac")) {
+		if (yourOS.contains("mac")) {
 			if (yourOSVersion.contains("10.15")) {
 				checkConfig(false);
 			} else {
 				checkConfig(false);
 			}
 		} // for future reference in case we need to test configurations separately
-		     for Mac OS, Catalina, Linux, etc*/
+		     //for Mac OS, Catalina, Linux, etc
 
 		System.out.println("Your system appears to be configured correctly. You've completed lab 1 setup.");
 	}
