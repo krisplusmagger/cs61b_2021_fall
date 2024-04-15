@@ -107,4 +107,15 @@ public class LinkedListDeque<T> {
     public boolean isEmpty() {
         return  size == 0;
     }
+    public void printDeque(){
+
+        TNode p;
+        p = sentinel_F;
+        while(p.next.item != null) {
+
+            System.out.print(p.next.item + " ");
+            p = p.next;
+        }
+        System.out.println(" ");
+    }
 }

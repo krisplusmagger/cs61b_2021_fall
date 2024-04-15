@@ -37,14 +37,17 @@ public class ArrayDeque<T> {
         int ptr1 = front_p;
         int ptr2 = length;
         while(ptr1 != back_p) {
+
             newArray[ptr2] = items[ptr1];
             ptr1 = plusOne(ptr1, length);
             ptr2 = plusOne(ptr2, length * 2);
         }
+        newArray[ptr2] = items[ptr1];
         front_p = length;
         back_p = ptr2;
         items = newArray;
         length *= 2;
+
     }
     private void shrink() {
         T[] newArray = (T[]) new Object[length / 2];
@@ -55,10 +58,12 @@ public class ArrayDeque<T> {
             ptr1 = plusOne(ptr1, length);
             ptr2 = plusOne(ptr2, length / 2);
         }
+        newArray[ptr2] = items[ptr1];
         front_p = length / 4;
         back_p = ptr2;
         items = newArray;
         length /= 2;
+
     }
 
 
@@ -66,6 +71,13 @@ public class ArrayDeque<T> {
         //如果size满了
         if (size == length - 1) {
             grow();
+        }
+        //for speical case if size == 0
+        if(size == 0) {
+            items[front_p] = x;
+//            front_p = minusOne(front_p);
+            size += 1;
+            return;
         }
         front_p = minusOne(front_p);
         items[front_p] = x;
@@ -76,10 +88,18 @@ public class ArrayDeque<T> {
         if(size == length - 1) {
             grow();
         }
+        //for speical case if size == 0
+        if(size == 0) {
+            items[back_p] = x;
+//            back_p = plusOne(back_p, length);
+            size += 1;
+            return;
+        }
         back_p = plusOne(back_p, length);
         items[back_p] = x;
         size += 1;
     }
+
     public T removeFirst() {
         if(length >= 16 && length /size >= 4) {
             shrink();
@@ -87,6 +107,7 @@ public class ArrayDeque<T> {
         if(size == 0) {
             return null;
         }
+
         T item = items[front_p];
         front_p = plusOne(front_p, length);
         size -= 1;
@@ -102,6 +123,7 @@ public class ArrayDeque<T> {
         if(size == 0) {
             return null;
         }
+
         T item = items[back_p];
         back_p = minusOne(back_p);
         size -= 1;
@@ -120,9 +142,10 @@ public class ArrayDeque<T> {
     public void printDeque() {
         int ptr = front_p;
         while(ptr != back_p) {
-            System.out.println(items[ptr] + " ");
+            System.out.print(items[ptr] + " ");
             ptr = plusOne(ptr, length);
         }
+        System.out.println(" ");
     }
     public int size(){
         return size;
