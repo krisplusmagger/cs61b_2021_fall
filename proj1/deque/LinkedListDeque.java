@@ -2,7 +2,7 @@ package deque;
 
 import jh61b.junit.In;
 
-public class LinkedListDeque<T> {
+public class LinkedListDeque<T> implements Deque<T> {
 
     public class TNode {
         public T item;
@@ -104,9 +104,9 @@ public class LinkedListDeque<T> {
     public int size() {
         return size;
     }
-    public boolean isEmpty() {
-        return  size == 0;
-    }
+//    public boolean isEmpty() {
+//        return  size == 0;
+//    }
     public void printDeque(){
 
         TNode p;

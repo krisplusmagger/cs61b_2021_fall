@@ -2,7 +2,7 @@ package deque;
 
 import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
-public class ArrayDeque<T> {
+public class ArrayDeque<T> implements Deque<T>{
     private T[] items;
     private int size;
     private int front_p;
@@ -150,8 +150,8 @@ public class ArrayDeque<T> {
     public int size(){
         return size;
     }
-    public boolean isEmpty(){
-        return size == 0;
-    }
+//    public boolean isEmpty(){
+//        return size == 0;
+//    }
 
 }
