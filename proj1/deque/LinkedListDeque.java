@@ -2,6 +2,7 @@ package deque;
 
 import jh61b.junit.In;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class LinkedListDeque<T> implements Deque<T> {
 
@@ -44,9 +45,16 @@ public class LinkedListDeque<T> implements Deque<T> {
 
     private class LinkedListIterator implements Iterator<T> {
         private int wizPos;
+        private int position;
+        private TNode returnItem;
 
         public LinkedListIterator() {
             wizPos = 0;
+            returnItem = sentinel_F;
+        }
+
+        public TNode next_helper(TNode p) {
+            return p.next;
         }
 
         public boolean hasNext() {
@@ -55,9 +63,9 @@ public class LinkedListDeque<T> implements Deque<T> {
 
         public T next() {
 
-            T returnItem = get(wizPos);
+            returnItem = next_helper(returnItem);
             wizPos += 1;
-            return returnItem;
+            return returnItem.item;
         }
     }
 
@@ -141,5 +149,27 @@ public class LinkedListDeque<T> implements Deque<T> {
             p = p.next;
         }
         System.out.println(" ");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if(!(o instanceof Deque)) {
+            return false;
+        }
+        LinkedListDeque <T> other = (LinkedListDeque<T>) o;
+        if(this.size() != other.size()) {
+            return false;
+        }
+        Iterator<T> thisIterator = this.iterator();
+        Iterator<T> otherIterator = other.iterator();
+        while(thisIterator.hasNext()) {
+            T thisElement = thisIterator.next();
+            T otherElement = otherIterator.next();
+            if(!Objects.equals(thisElement, otherElement)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

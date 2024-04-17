@@ -1,5 +1,7 @@
 package deque;
 import java.util.Iterator;
+import java.util.Objects;
+
 import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
 public class ArrayDeque<T> implements Deque<T>{
@@ -175,6 +177,26 @@ public class ArrayDeque<T> implements Deque<T>{
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
 
+        if(!(o instanceof Deque)) {
+            return false;
+        }
+        ArrayDeque<T> other = (ArrayDeque<T>) o;
+        if(this.size() != other.size()) {
+            return false;
+        }
+        Iterator<T> thisIterator = this.iterator();
+        Iterator<T> otherIterator = other.iterator();
+        while(thisIterator.hasNext()) {
+            T thisElement = thisIterator.next();
+            T otherElement = otherIterator.next();
+            if(!Objects.equals(thisElement, otherElement)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }
