@@ -1,6 +1,7 @@
 package deque;
 
 import jh61b.junit.In;
+import java.util.Iterator;
 
 public class LinkedListDeque<T> implements Deque<T> {
 
@@ -35,6 +36,29 @@ public class LinkedListDeque<T> implements Deque<T> {
         sentinel_B = new TNode(null, null, null);
         sentinel_F.next = sentinel_B;
         sentinel_B.prev = sentinel_F;
+    }
+
+    public Iterator<T> iterator() {
+        return new LinkedListIterator();
+    }
+
+    private class LinkedListIterator implements Iterator<T> {
+        private int wizPos;
+
+        public LinkedListIterator() {
+            wizPos = 0;
+        }
+
+        public boolean hasNext() {
+            return wizPos < size;
+        }
+
+        public T next() {
+
+            T returnItem = get(wizPos);
+            wizPos += 1;
+            return returnItem;
+        }
     }
 
 

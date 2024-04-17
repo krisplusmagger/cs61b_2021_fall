@@ -1,5 +1,5 @@
 package deque;
-
+import java.util.Iterator;
 import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
 public class ArrayDeque<T> implements Deque<T>{
@@ -153,5 +153,28 @@ public class ArrayDeque<T> implements Deque<T>{
 //    public boolean isEmpty(){
 //        return size == 0;
 //    }
+    public Iterator<T> iterator() {
+        return new ArrayIterator();
+    }
+
+    private class ArrayIterator implements Iterator<T> {
+        private int wizPos;
+
+        public ArrayIterator() {
+            wizPos = 0;
+        }
+
+        public boolean hasNext(){
+            return wizPos < size;
+        }
+
+        public T next(){
+            T returnItem = get(wizPos);
+            wizPos += 1;
+            return returnItem;
+        }
+    }
+
+
 
 }
