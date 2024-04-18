@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
-public class ArrayDeque<T> implements Deque<T>{
+public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     private T[] items;
     private int size;
     private int front_p;
@@ -21,7 +21,7 @@ public class ArrayDeque<T> implements Deque<T>{
         front_p = 4;
     }
     private int minusOne(int index) {
-        if(index == 0) {
+        if (index == 0) {
             return length - 1;
         }
         return index - 1;
@@ -29,7 +29,7 @@ public class ArrayDeque<T> implements Deque<T>{
     private int plusOne(int index, int module) {
         // 10 % 15 = 10
         index %= module;
-        if(index == module - 1) {
+        if (index == module - 1) {
             return 0;
         }
         return index + 1;
@@ -38,7 +38,7 @@ public class ArrayDeque<T> implements Deque<T>{
         T[] newArray = (T[]) new Object[length * 2];
         int ptr1 = front_p;
         int ptr2 = length;
-        while(ptr1 != back_p) {
+        while (ptr1 != back_p) {
 
             newArray[ptr2] = items[ptr1];
             ptr1 = plusOne(ptr1, length);
@@ -55,7 +55,7 @@ public class ArrayDeque<T> implements Deque<T>{
         T[] newArray = (T[]) new Object[length / 2];
         int ptr1 = front_p;
         int ptr2 = length / 4;
-        while(ptr1 != back_p) {
+        while( ptr1 != back_p) {
             newArray[ptr2] = items[ptr1];
             ptr1 = plusOne(ptr1, length);
             ptr2 = plusOne(ptr2, length / 2);
@@ -75,9 +75,14 @@ public class ArrayDeque<T> implements Deque<T>{
             grow();
         }
         //for speical case if size == 0
-        if(size == 0) {
+        if (size == 0) {
             items[front_p] = x;
 //            front_p = minusOne(front_p);
+            size += 1;
+            return;
+        }
+        if(items[front_p] == null) {
+            items[front_p] = x;
             size += 1;
             return;
         }
@@ -87,13 +92,18 @@ public class ArrayDeque<T> implements Deque<T>{
     }
     /** Inserts X into the back of the list */
     public void addLast(T x) {
-        if(size == length - 1) {
+        if (size == length - 1) {
             grow();
         }
         //for speical case if size == 0
-        if(size == 0) {
+        if (size == 0) {
             items[back_p] = x;
 //            back_p = plusOne(back_p, length);
+            size += 1;
+            return;
+        }
+        if (items[back_p] == null) {
+            items[back_p] = x;
             size += 1;
             return;
         }
@@ -103,14 +113,17 @@ public class ArrayDeque<T> implements Deque<T>{
     }
 
     public T removeFirst() {
-        if(length >= 16 && length /size >= 4) {
+        if (length >= 16 && length / size >= 4) {
             shrink();
         }
-        if(size == 0) {
+        if (size == 0) {
+            front_p = 4;
+            back_p = 4;
             return null;
         }
 
         T item = items[front_p];
+        items[front_p] = null;
         front_p = plusOne(front_p, length);
         size -= 1;
         return item;
@@ -119,31 +132,34 @@ public class ArrayDeque<T> implements Deque<T>{
     /** Remove the element of the back*/
     public T removeLast() {
 
-        if(length >= 16 && length / size >= 4) {
+        if (length >= 16 && length / size >= 4) {
             shrink();
         }
-        if(size == 0) {
+        if (size == 0) {
+            front_p = 4;
+            back_p = 4;
             return null;
         }
 
         T item = items[back_p];
+        items[back_p] = null;
         back_p = minusOne(back_p);
         size -= 1;
         return item;
     }
     public T get(int index) {
-        if(index >= size) {
+        if (index >= size) {
             return null;
         }
         int ptr = front_p;
-        for(int i = 0; i < index; i++) {
+        for (int i = 0; i < index; i++) {
             ptr = plusOne(ptr, length);
         }
         return items[ptr];
     }
     public void printDeque() {
         int ptr = front_p;
-        while(ptr != back_p) {
+        while (ptr != back_p) {
             System.out.print(items[ptr] + " ");
             ptr = plusOne(ptr, length);
         }
@@ -152,9 +168,7 @@ public class ArrayDeque<T> implements Deque<T>{
     public int size(){
         return size;
     }
-//    public boolean isEmpty(){
-//        return size == 0;
-//    }
+
     public Iterator<T> iterator() {
         return new ArrayIterator();
     }
@@ -180,19 +194,23 @@ public class ArrayDeque<T> implements Deque<T>{
     @Override
     public boolean equals(Object o) {
 
-        if(!(o instanceof Deque)) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
             return false;
         }
-        ArrayDeque<T> other = (ArrayDeque<T>) o;
-        if(this.size() != other.size()) {
+        if (!(o instanceof Deque)) {
             return false;
         }
-        Iterator<T> thisIterator = this.iterator();
-        Iterator<T> otherIterator = other.iterator();
-        while(thisIterator.hasNext()) {
-            T thisElement = thisIterator.next();
-            T otherElement = otherIterator.next();
-            if(!Objects.equals(thisElement, otherElement)) {
+        Deque<T> other = (Deque<T>) o;
+        if (this.size() != other.size()) {
+            return false;
+        }
+        for(int i = 0; i < other.size(); i += 1) {
+            T thisItem = this.get(i);
+            T otherItem = other.get(i);
+            if (!thisItem.equals(otherItem)) {
                 return false;
             }
         }

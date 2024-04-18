@@ -38,6 +38,30 @@ public class ArrayDequeTest {
         assertTrue("aad1 should be empty after removal", aad1.isEmpty());
     }
     @Test
+    public void testAddFirstAndAddLast() {
+        Deque<Integer> deque = new ArrayDeque<>();
+        deque.addLast(8);
+        deque.addLast(1);
+        deque.removeFirst();
+        deque.removeFirst();
+        deque.removeLast() ;
+        deque.addFirst(6);
+        deque.addLast(7);
+        deque.removeLast() ;
+        deque.addFirst(9);
+        deque.addFirst(10);
+        deque.removeFirst();
+        deque.removeFirst();
+        deque.addFirst(13);
+        deque.addFirst(14);
+        deque.removeFirst();
+        deque.removeLast();
+
+
+
+
+    }
+    @Test
     public void removeEmptyTest() {
 
         System.out.println("Make sure to uncomment the lines below (and delete this print statement).");
@@ -120,33 +144,5 @@ public class ArrayDequeTest {
         assertEquals(0, dq.size());
     }
 
-//    public ArrayDeque<Integer> create(int[] array) {
-//        ArrayDeque<Integer> dq = new ArrayDeque<>();
-//        for (int x : array) {
-//            dq.addLast(x);
-//        }
-//        return dq;
-//    }
-//    @Test
 
-//    public void testgrowshrink() {
-//        ArrayDeque<Integer> dq = new ArrayDeque<>();
-//        for (int i = 0; i < 16; i++) {
-//            dq.addLast(i);
-//        }
-//        for (int i = -16; i < 0; i++) {
-//            dq.addFirst(i);
-//        }
-//        for (int i = -1; i >= 16; i--) {
-//            assertEquals(i, dq.get(i));
-//        }
-//        for (int i = 0; i < 30; i++) {
-//            dq.removeFirst();
-//        }
-//        assertEquals(2, dq.size());
-//        dq.printDeque();
-//    }
-//    public void main(String[] args) {
-//        testgrowshrink();
-//    }
 }
