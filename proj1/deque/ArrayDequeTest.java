@@ -2,7 +2,7 @@ package deque;
 
 import org.junit.Test;
 import static org.junit.Assert.*;
-
+import java.util.Random;
 
 public class ArrayDequeTest {
 
@@ -142,6 +142,48 @@ public class ArrayDequeTest {
         assertEquals("last", last);
 
         assertEquals(0, dq.size());
+    }
+    @Test
+    public void testRandomOperations() {
+        Deque<Integer> deque = new ArrayDeque<>();
+        java.util.Deque<Integer> referenceDeque = new java.util.ArrayDeque<>();
+
+        Random random = new Random();
+        int operations = 10000;
+
+        for (int i = 0; i < operations; i++) {
+            int operation = random.nextInt(5);
+            int value = random.nextInt(1000);
+
+            switch (operation) {
+                case 0:
+                    deque.addFirst(value);
+                    referenceDeque.addFirst(value);
+                    break;
+                case 1:
+                    deque.addLast(value);
+                    referenceDeque.addLast(value);
+                    break;
+                case 2:
+                    if (!referenceDeque.isEmpty()) {
+                        assertEquals(referenceDeque.removeFirst(), deque.removeFirst());
+                    }
+                    break;
+                case 3:
+                    if (!referenceDeque.isEmpty()) {
+                        assertEquals(referenceDeque.removeLast(), deque.removeLast());
+                    }
+                    break;
+
+            }
+
+            assertEquals(referenceDeque.size(), deque.size());
+            assertEquals(referenceDeque.isEmpty(), deque.isEmpty());
+//            if (!referenceDeque.isEmpty()) {
+//                assertEquals(referenceDeque.getFirst(), deque.get(0));
+//                assertEquals(referenceDeque.getLast(), deque.get(0));
+//            }
+        }
     }
 
 

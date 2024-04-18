@@ -1,220 +1,202 @@
 package deque;
+
 import java.util.Iterator;
-import java.util.Objects;
 
-import org.antlr.v4.runtime.misc.ObjectEqualityComparator;
 
-public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
+
+public class ArrayDeque<T> implements Deque<T> ,Iterable<T>{
     private T[] items;
     private int size;
-    private int front_p;
-    private int back_p;
-    private int length;
+    private int nextFirst;
+    private int nextLast;
 
-
-    /** Create an empty list*/
-    public ArrayDeque() {
+    /** Creates an empty Array deque. */
+    public ArrayDeque(){
         items = (T[]) new Object[8];
-        length = 8;
         size = 0;
-        back_p = 4;
-        front_p = 4;
-    }
-    private int minusOne(int index) {
-        if (index == 0) {
-            return length - 1;
-        }
-        return index - 1;
-    }
-    private int plusOne(int index, int module) {
-        // 10 % 15 = 10
-        index %= module;
-        if (index == module - 1) {
-            return 0;
-        }
-        return index + 1;
-    }
-    private void grow() {
-        T[] newArray = (T[]) new Object[length * 2];
-        int ptr1 = front_p;
-        int ptr2 = length;
-        while (ptr1 != back_p) {
-
-            newArray[ptr2] = items[ptr1];
-            ptr1 = plusOne(ptr1, length);
-            ptr2 = plusOne(ptr2, length * 2);
-        }
-        newArray[ptr2] = items[ptr1];
-        front_p = length;
-        back_p = ptr2;
-        items = newArray;
-        length *= 2;
-
-    }
-    private void shrink() {
-        T[] newArray = (T[]) new Object[length / 2];
-        int ptr1 = front_p;
-        int ptr2 = length / 4;
-        while( ptr1 != back_p) {
-            newArray[ptr2] = items[ptr1];
-            ptr1 = plusOne(ptr1, length);
-            ptr2 = plusOne(ptr2, length / 2);
-        }
-        newArray[ptr2] = items[ptr1];
-        front_p = length / 4;
-        back_p = ptr2;
-        items = newArray;
-        length /= 2;
-
+        nextFirst = 8 / 2;
+        nextLast = (8 / 2) + 1;
     }
 
-
-    public void addFirst(T x) {
-        //如果size满了
-        if (size == length - 1) {
-            grow();
+    /** Resizes the underlying array to the target capacity. */
+    private void resize(int capacity, boolean isAdd){
+        T[] newItems = (T[]) new Object[capacity];
+        // if resize() called by addFirst/Last, copy to all old items in middle part
+        // (i.e. from "size/2" to "size/2 + size - 1")
+        // otherwise, resize() called by removeFirst/Last, copy to all old items from index of first
+        // note: "size" is old "size"
+        if (isAdd){
+            System.arraycopy(items, nextLast, newItems, size / 2, size - nextLast);
+            System.arraycopy(items, 0, newItems, (size - nextLast) + size / 2, nextLast);
+        } else {
+            System.arraycopy(items, (nextFirst + 1) % items.length, newItems, 0, size);
         }
-        //for speical case if size == 0
-        if (size == 0) {
-            items[front_p] = x;
-//            front_p = minusOne(front_p);
-            size += 1;
-            return;
-        }
-        if(items[front_p] == null) {
-            items[front_p] = x;
-            size += 1;
-            return;
-        }
-        front_p = minusOne(front_p);
-        items[front_p] = x;
-        size += 1;
-    }
-    /** Inserts X into the back of the list */
-    public void addLast(T x) {
-        if (size == length - 1) {
-            grow();
-        }
-        //for speical case if size == 0
-        if (size == 0) {
-            items[back_p] = x;
-//            back_p = plusOne(back_p, length);
-            size += 1;
-            return;
-        }
-        if (items[back_p] == null) {
-            items[back_p] = x;
-            size += 1;
-            return;
-        }
-        back_p = plusOne(back_p, length);
-        items[back_p] = x;
-        size += 1;
+        items = newItems;
     }
 
-    public T removeFirst() {
-        if (length >= 16 && length / size >= 4) {
-            shrink();
+    /** Adds item to the front of the deque. */
+    @Override
+    public void addFirst(T item){
+        if (size == items.length) {
+            resize(size * 2, true);
+            // keep circular deque,
+            // the index of first after nextFirst and the index of last before nextLast
+            nextFirst = (size / 2) - 1;
+            nextLast = size / 2 + size;
         }
-        if (size == 0) {
-            front_p = 4;
-            back_p = 4;
+        // "-1 % items.length == -1" in java
+        items[nextFirst] = item;
+        if ((nextFirst - 1) % items.length == -1){
+            nextFirst = (nextFirst - 1) + items.length;
+        } else {
+            nextFirst = (nextFirst - 1) % items.length;
+        }
+        size = size + 1;
+    }
+
+    /** Inserts X into the back of the deque. */
+    @Override
+    public void addLast(T item){
+        if (size == items.length) {
+            resize(size * 2, true);
+            // keep circular deque,
+            // the index of first after nextFirst and the index of last before nextLast
+            nextFirst = (size / 2) - 1;
+            nextLast = size / 2 + size;
+        }
+        items[nextLast] = item;
+        nextLast = (nextLast + 1) % items.length;
+        size = size + 1;
+    }
+
+    /** Removes the front of the deque. */
+    @Override
+    public T removeFirst(){
+        if (isEmpty()){
             return null;
         }
-
-        T item = items[front_p];
-        items[front_p] = null;
-        front_p = plusOne(front_p, length);
-        size -= 1;
+        if ((size < items.length / 4) && (size > 4)) {
+            resize(items.length / 4, false);
+            // After reducing to 25%, nextFirst and nextLast resets to new "size"
+            nextFirst = size;
+            nextLast = size;
+        }
+        nextFirst = (nextFirst + 1) % items.length;
+        T item = items[nextFirst];
+        items[nextFirst] = null;
+        size = size - 1;
         return item;
     }
 
-    /** Remove the element of the back*/
-    public T removeLast() {
-
-        if (length >= 16 && length / size >= 4) {
-            shrink();
-        }
-        if (size == 0) {
-            front_p = 4;
-            back_p = 4;
+    /** Removes the back of the deque. */
+    @Override
+    public T removeLast(){
+        if (isEmpty()){
             return null;
         }
-
-        T item = items[back_p];
-        items[back_p] = null;
-        back_p = minusOne(back_p);
-        size -= 1;
+        if ((size < items.length / 4) && (size > 4)) {
+            resize(items.length / 4,false);
+            // After reducing to 25%, nextFirst and nextLast resets to new "size"
+            nextFirst = size;
+            nextLast = size;
+        }
+        // "-1 % items.length == -1" in java
+        if ((nextLast - 1) % items.length == -1){
+            nextLast = (nextLast - 1) + items.length;
+        } else {
+            nextLast = (nextLast - 1) % items.length;
+        }
+        T item = items[nextLast];
+        items[nextLast] = null;
+        size = size - 1;
         return item;
     }
-    public T get(int index) {
-        if (index >= size) {
-            return null;
+
+    /** Gets the ith item in the deque (0 is the front). */
+    // note: when add first from 0 to 3, then, the list is "3->2->1->0", the "3" is first
+    @Override
+    public T get(int i){
+        int index = nextFirst + i + 1;
+        if (index > 0){
+            return items[index % items.length];
         }
-        int ptr = front_p;
-        for (int i = 0; i < index; i++) {
-            ptr = plusOne(ptr, length);
-        }
-        return items[ptr];
+        return items[index + items.length];
     }
-    public void printDeque() {
-        int ptr = front_p;
-        while (ptr != back_p) {
-            System.out.print(items[ptr] + " ");
-            ptr = plusOne(ptr, length);
-        }
-        System.out.println(" ");
-    }
+
+    /** Returns the number of items in the deque. */
+    @Override
     public int size(){
         return size;
     }
 
-    public Iterator<T> iterator() {
-        return new ArrayIterator();
+    /** Prints the items in the deque from first to last, separated by a space.
+     * Once all the items have been printed, print out a new line. */
+    @Override
+    public void printDeque(){
+        int tempSize = size();
+        int cnt = nextFirst + 1;
+        while(tempSize > 0){
+            if (tempSize == 1){
+                System.out.println(items[cnt]);
+                return;
+            }
+            System.out.print(items[cnt]+" -> ");
+            cnt = (cnt + 1) % items.length;
+            tempSize -= 1;
+        }
     }
 
-    private class ArrayIterator implements Iterator<T> {
-        private int wizPos;
+    // The Deque objects we’ll make are iterable (i.e. Iterable<T>)
+    // so we must provide this method to return an iterator.
+    public Iterator<T> iterator(){
+        return new ArrayDequeIterator();
+    }
 
-        public ArrayIterator() {
-            wizPos = 0;
+    private class ArrayDequeIterator implements Iterator<T> {
+        private int cnt;
+
+        public ArrayDequeIterator() {
+            cnt = 0;
         }
 
-        public boolean hasNext(){
-            return wizPos < size;
+        public boolean hasNext() {
+            return cnt < size();
         }
 
-        public T next(){
-            T returnItem = get(wizPos);
-            wizPos += 1;
+        public T next() {
+            T returnItem = get(cnt);
+            cnt += 1;
             return returnItem;
         }
     }
 
+    //Returns whether or nor the parameter o is equal to the Deque.
+    // o is considered equal if it is a Deque and if it contains the same contents
+    // (as goverened by the generic T’s equals method) in the same order.
+    // note: use "equals" instead of "==", when comparing of content from object
     @Override
-    public boolean equals(Object o) {
-
+    public boolean equals(Object o){
         if (this == o) {
             return true;
         }
         if (o == null) {
             return false;
         }
-        if (!(o instanceof Deque)) {
+        if (!(o instanceof Deque)){
             return false;
         }
-        Deque<T> other = (Deque<T>) o;
-        if (this.size() != other.size()) {
+
+        Deque<T> obj = (Deque<T>)o;
+        if (obj.size() != this.size()){
             return false;
         }
-        for(int i = 0; i < other.size(); i += 1) {
-            T thisItem = this.get(i);
-            T otherItem = other.get(i);
-            if (!thisItem.equals(otherItem)) {
+        for(int i = 0; i < obj.size(); i += 1){
+            T itemFromObj =  obj.get(i);
+            T itemFromThis = this.get(i);
+            if (!itemFromObj.equals(itemFromThis)){
                 return false;
             }
         }
         return true;
     }
-
 }

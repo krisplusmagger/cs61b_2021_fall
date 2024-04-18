@@ -10,12 +10,12 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
     }
 
     public T max() {
-        if(isEmpty()) {
+        if (isEmpty()) {
             return null;
         }
         T maxItem = this.get(0);
         int i = 0;
-        while(i < this.size()) {
+        while (i < this.size()) {
             if (comparator.compare(this.get(i), maxItem) > 0) {
                 maxItem = this.get(i);
             }
@@ -25,12 +25,12 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
     }
 
     public T max(Comparator<T> c) {
-        if(isEmpty()) {
+        if (isEmpty()) {
             return null;
         }
         T maxItem = this.get(0);
         int i = 0;
-        while(i < this.size()) {
+        while (i < this.size()) {
             if (c.compare(this.get(i), maxItem) > 0) {
                 maxItem = this.get(i);
             }
